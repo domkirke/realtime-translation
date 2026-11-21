@@ -1,6 +1,7 @@
 #!/bin/sh
 # Creates .venv in this folder and installs realtime-translation in it (editable).
-# On Apple Silicon the MLX backends (Voxtral MLX, mlx-whisper) are installed too.
+# On Apple Silicon the MLX backends (Voxtral MLX, mlx-whisper) are installed too ;
+# on Linux with an NVIDIA GPU, the GPU server backends (Voxtral through transformers).
 set -e
 cd "$(dirname "$0")"
 PYTHON_VERSION="${PYTHON_VERSION:-3.12}"
@@ -8,6 +9,8 @@ PYTHON_VERSION="${PYTHON_VERSION:-3.12}"
 EXTRAS=""
 if [ "$(uname -s)" = "Darwin" ] && [ "$(uname -m)" = "arm64" ]; then
     EXTRAS="[mlx]"
+elif [ "$(uname -s)" = "Linux" ] && command -v nvidia-smi >/dev/null 2>&1; then
+    EXTRAS="[gpu]"
 fi
 
 if command -v uv >/dev/null 2>&1; then

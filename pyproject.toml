@@ -19,6 +19,8 @@ dependencies = [
 [project.optional-dependencies]
 # Apple Silicon : MLX backends (voxtral-mlx is the default backend of the client)
 mlx = ["whisperlivekit[voxtral-mlx,mlx-whisper]>=0.2.26"]
+# Linux + NVIDIA GPU server : Voxtral through transformers (needs mistral-common)
+gpu = ["whisperlivekit[translation,voxtral-hf]>=0.2.26", "mistral-common[audio,image]>=1.11.7", "pillow"]
 
 [project.scripts]
 rt-translate = "realtime_translation.client:main"

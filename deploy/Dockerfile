@@ -13,7 +13,7 @@ COPY realtime_translation ./realtime_translation
 COPY deploy/server.sh ./deploy/server.sh
 RUN pip install --no-cache-dir uv \
  && uv venv --python 3.12 .venv \
- && uv pip install --python .venv/bin/python --no-cache -e . "whisperlivekit[translation,voxtral-hf]>=0.2.26"
+ && uv pip install --python .venv/bin/python --no-cache -e ".[gpu]"
 
 VOLUME /models
 EXPOSE 8000

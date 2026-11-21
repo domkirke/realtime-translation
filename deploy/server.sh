@@ -23,15 +23,19 @@ if [ -z "$WLK_API_TOKEN" ] && [ -z "$ALLOW_NO_TOKEN" ]; then
     exit 1
 fi
 
-if [ ! -x .venv/bin/rt-translate-server ]; then
+# (re)install when something is missing, e.g. if .venv was created by install.sh without the GPU packages
+# (mistral-common : transformers' own check, which also requires a minimum version and Pillow)
+if ! .venv/bin/python -c "import realtime_translation, whisperlivekit, nllw
+from transformers.utils.import_utils import is_mistral_common_available
+assert is_mistral_common_available()" 2>/dev/null; then
     command -v ffmpeg >/dev/null 2>&1 || { (apt-get update && apt-get install -y ffmpeg) >/dev/null 2>&1 || \
         echo "warning : ffmpeg not installed (only needed for non-PCM clients)"; }
     if ! command -v uv >/dev/null 2>&1; then
         curl -LsSf https://astral.sh/uv/install.sh | sh
         PATH="$HOME/.local/bin:$PATH"
     fi
-    uv venv --python 3.12 .venv
-    uv pip install --python .venv/bin/python -e . "whisperlivekit[translation,voxtral-hf]>=0.2.26"
+    [ -x .venv/bin/python ] || uv venv --python 3.12 .venv
+    uv pip install --python .venv/bin/python --upgrade -e ".[gpu]"
 fi
 
 .venv/bin/python -c "import torch; assert torch.cuda.is_available(), 'no CUDA GPU visible'; \
