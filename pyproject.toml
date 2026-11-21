@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "realtime-translation"
+version = "0.1.0"
+description = "Real-time transcription + translation (WhisperLiveKit, Voxtral MLX, NLLW) streamed to stdout / OSC / JSONL"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "whisperlivekit[translation]>=0.2.26",
+    "numpy",
+    "websockets>=12",
+    "librosa",
+    "soundcard",
+    "python-osc",
+]
+
+[project.optional-dependencies]
+# Apple Silicon : MLX backends (voxtral-mlx is the default backend of the client)
+mlx = ["whisperlivekit[voxtral-mlx,mlx-whisper]>=0.2.26"]
+
+[project.scripts]
+rt-translate = "realtime_translation.client:main"
+rt-translate-server = "realtime_translation.server:main"
+
+[tool.setuptools]
+packages = ["realtime_translation"]

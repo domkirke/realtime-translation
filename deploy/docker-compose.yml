@@ -1,0 +1,26 @@
+# docker compose -f deploy/docker-compose.yml up -d     (WLK_API_TOKEN in the environment or in deploy/.env)
+services:
+  realtime-translation:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    environment:
+      WLK_API_TOKEN: ${WLK_API_TOKEN:?set WLK_API_TOKEN}
+      BACKEND: ${BACKEND:-voxtral}
+      LAN: ${LAN:-auto}
+      TARGET_LANGUAGE: ${TARGET_LANGUAGE-en}
+      NLLB_SIZE: ${NLLB_SIZE:-1.3B}
+    ports:
+      - "127.0.0.1:8000:8000"   # local only : use an SSH tunnel or a TLS reverse proxy to reach it
+    volumes:
+      - models:/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+volumes:
+  models:
